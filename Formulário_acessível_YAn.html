@@ -1,0 +1,336 @@
+<!DOCTYPE html> <!-- Declara HTML5 -->
+<html lang="pt-br"> <!-- Idioma do documento -->
+<head> <!-- Cabeçalho (metadados) -->
+  <meta charset="UTF-8"> <!-- Suporte a acentos -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Layout responsivo -->
+  <title>Contato - Informe abaixo os dados solicitados:</title> <!-- Título da aba -->
+
+  <style> /* ----- CSS GERAL DO SITE ----- */
+    body{ /* Tipografia base e fundo da página */
+      font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell;
+      background:#61564e; margin:0; padding:24px;
+    }
+
+    .wrap{ /* Container do formulário */
+      max-width:480px; margin:0 auto; background:#fff;
+      border:1px solid #e5e7eb; border-radius:12px; padding:18px 20px;
+    }
+
+    label{ display:block; margin:10px 0 6px; } /* Rótulos sempre em bloco */
+
+    input, textarea, select{ /* Campos base */
+      width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1;
+    }
+
+    input:focus, textarea:focus, select:focus{ /* Acessibilidade do foco */
+      outline:2px solid #2563eb; outline-offset:2px;
+    }
+
+    .help{ color:#64748b; font-size:.9rem; } /* Texto de ajuda */
+
+    /* --- Botões padrão --- */
+    .btn{
+      margin-top:12px; padding:10px 16px; border-radius:20px;
+      border:2.5px solid #cbd5e1; background:#fff; color:#2563eb;
+      cursor:pointer; transition:transform .15s;
+    }
+    .btn:hover{ transform:translateY(-1px); }  /* Elevação no hover */
+    .btn:active{ transform:translateY(1px); }  /* Pressionado */
+
+    /* Botão de destaque vermelho (apenas quando usar a classe extra) */
+    .btn-danger{
+      border-color:#dc2626; color:#dc2626;
+    }
+    /* Se quiser fundo vermelho também, descomente a linha abaixo */
+    /* .btn-danger{ background:#fee2e2; } */
+
+    /* ----- INTERRUPTOR DE TEMA ----- */
+    /* ===== Tema por variáveis ===== */
+:root{
+  --bg: #61564e;         /* fundo página (claro) */
+  --panel: #ffffff;      /* fundo cartões */
+  --text: #0f172a;       /* texto principal */
+  --muted: #64748b;      /* textos auxiliares */
+  --border: #e5e7eb;     /* bordas */
+}
+
+/* Dark mode (quando body[data-theme="dark"]) */
+body[data-theme="dark"]{
+  --bg: #0b1220;
+  --panel: #0f172a;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --border: #1f2937;
+}
+
+/* Aplicação das variáveis nos seus blocos existentes */
+body{
+  background: var(--bg);
+  color: var(--text);
+}
+.wrap{
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+.help{ color: var(--muted); }
+
+/* Calculadora herdando tema */
+.calc-display{
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+/* Botões podem herdar bordas/cores (opcional) */
+.btn{ border-color: var(--border); color:#2563eb; background:#fff; }
+
+/* ===== Estilos do interruptor ===== */
+.theme-toggle{
+  display:inline-flex; align-items:center; gap:.6rem;
+  background: var(--panel); border:1px solid var(--border);
+  border-radius:999px; padding:6px 10px; margin:0 0 16px;
+}
+.theme-toggle .label{ color: var(--muted); font-size:.9rem; }
+.theme-toggle input{ display:none; }
+.theme-toggle .slider{
+  width:44px; height:24px; border-radius:999px;
+  background:#cbd5e1; position:relative; display:inline-block;
+}
+.theme-toggle .slider::after{
+  content:""; width:18px; height:18px; border-radius:50%;
+  background:#fff; position:absolute; top:3px; left:3px; transition:transform .2s;
+}
+.theme-toggle input:checked + .slider{ background:#22c55e; }
+.theme-toggle input:checked + .slider::after{ transform: translateX(20px); }
+
+  </style>
+
+  <style> /* ----- CSS DA CALCULADORA (NOMES ISOLADOS) ----- */
+    .calc{ /* Wrapper da calculadora */
+      max-width:480px; margin:24px auto; font-family:inherit; color:#0f172a;
+    }
+
+    .calc h2{ /* Título da calculadora */
+      margin:0 0 12px; font-size:2rem; color:#334155; text-align:center;
+    }
+
+    .calc-display{ /* Visor da calculadora */
+      background:#0b1220; color:#e2e8f0; text-align:right;
+      padding:14px 12px; border-radius:12px; font-size:1.8rem; letter-spacing:.02em;
+      border:1px solid #1f2937; margin-bottom:10px; min-height:52px;
+    }
+
+    .calc-grid{ display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; } /* Grade dos botões */
+
+    .btn-calc{ /* Botões da calculadora */
+      padding:16px; border-radius:12px; border:1px solid #cbd5e1; background:#fff; color:#0f172a; font-size:12px;
+      cursor:pointer; transition: transform .15s, background .12s, color .12s, border-color .12s; /* corrigido 'background' */
+    }
+    .btn-calc:hover{ transform:translateY(-1px); }  /* Efeito hover */
+    .btn-calc:active{ transform:translateY(1px); }  /* Efeito active */
+
+    .btn-calc.op{ background:#eef2ff; border-color:#93c5fd; color:#1e3a8a; } /* Operadores */
+    .btn-calc.util{ background:#f1f5f9; color:#334155; } /* Utilitários (C, ⌫, %) */
+    .btn-calc.equal{ background:#22c55e; border-color:#16a34a; color:#071b0c; font-weight:700; } /* Igual */
+    .btn-calc.wide{ grid-column: span 2.8; } /* Botão largo (se quiser) */
+    .btn-calc.danger{ background:#fee2e2; border-color:#ef4444; color:#991b1b; } /* Opcional "perigo" */
+  </style>
+</head> <!-- FIM DO HEAD -->
+
+<body> <!-- CONTEÚDO VISÍVEL COMEÇA AQUI -->
+
+  <!-- ===== CALCULADORA ===== -->
+  <section class="calc" id="calc"> <!-- Wrapper com id 'calc' usado pelo JS -->
+    <h2>Calculadora</h2> <!-- Título limpo (sem style inline desnecessário) -->
+    <h3 style="font-size: 16px; font-style: italic; text-align:center;">Realize abaixo os cálculos desejados</h3> <!-- Subtítulo -->
+
+    <div class="calc-display" id="calcDisplay">0</div> <!-- Visor com id consistente (calcDisplay) -->
+
+    <div class="calc-grid"> <!-- Grade de botões -->
+      <!-- Linha 1 -->
+      <button class="btn-calc util" data-action="clear">C</button> <!-- Limpar tudo -->
+      <button class="btn-calc util" data-action="back">⌫</button> <!-- Apagar último dígito -->
+      <button class="btn-calc util" data-action="percent">%</button> <!-- Porcentagem -->
+      <button class="btn-calc op"   data-action="op" data-op="/">÷</button> <!-- Divisão -->
+
+      <!-- Linha 2 -->
+      <button class="btn-calc" data-action="digit" data-digit="7">7</button>
+      <button class="btn-calc" data-action="digit" data-digit="8">8</button>
+      <button class="btn-calc" data-action="digit" data-digit="9">9</button>
+      <button class="btn-calc op" data-action="op" data-op="*">×</button> <!-- Multiplicação -->
+
+      <!-- Linha 3 -->
+      <button class="btn-calc" data-action="digit" data-digit="4">4</button>
+      <button class="btn-calc" data-action="digit" data-digit="5">5</button>
+      <button class="btn-calc" data-action="digit" data-digit="6">6</button>
+      <button class="btn-calc op" data-action="op" data-op="-">−</button> <!-- Subtração -->
+
+      <!-- Linha 4 -->
+      <button class="btn-calc" data-action="digit" data-digit="1">1</button>
+      <button class="btn-calc" data-action="digit" data-digit="2">2</button>
+      <button class="btn-calc" data-action="digit" data-digit="3">3</button>
+      <button class="btn-calc op" data-action="op" data-op="+">+</button> <!-- Soma -->
+
+      <!-- Linha 5 -->
+      <button class="btn-calc wide" data-action="digit" data-digit="0">0</button> <!-- Zero largo -->
+      <button class="btn-calc" data-action="digit" data-digit=".">.</button> <!-- Ponto decimal como dígito -->
+      <button class="btn-calc equal" data-action="equal">=</button> <!-- Igual -->
+      <button class="btn-calc danger" data-action="clear"></DEL></button> <!-- Botão de perigo (opcional) -->
+      <!-- Se quiser um botão extra de perigo, use a classe .danger (abaixo é exemplo, sem ação atrelada) -->
+      <!-- <button class="btn-calc danger" data-action="clear">DEL</button> -->
+    </div> <!-- fim .calc-grid -->
+  </section>
+  <!-- ===== FIM CALCULADORA ===== -->
+
+  <!-- ===== FORMULÁRIO ===== -->
+  <div class="wrap"> <!-- Container do formulário -->
+    <h1>Contato</h1> <!-- Título do formulário -->
+    <h2 style="color:#31312f;text-align:center;font-size:20px;font-variant:small-caps;">
+      Informe abaixo os <strong>dados</strong> solicitados:
+    </h2>
+
+    <label for="nome">Nome</label> <!-- Rótulo do campo nome -->
+    <input id="nome" type="text" placeholder="Seu nome" required aria-describedby="d1"> <!-- Campo nome -->
+    <div id="d1" class="help">Obrigatório</div> <!-- Ajuda do campo nome -->
+
+    <label for="uf">Estado</label> <!-- Rótulo UF -->
+    <select id="uf"> <!-- Select UF -->
+      <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+      <option>BA</option><option>CE</option><option>ES</option><option>GO</option>
+      <option>MG</option>
+    </select>
+
+    <label for="msg">Mensagem</label> <!-- Rótulo mensagem -->
+    <textarea id="msg" rows="4" placeholder="Sua mensagem"></textarea> <!-- Campo mensagem -->
+
+    <button class="btn">Enviar</button> <!-- Botão padrão -->
+    <button class="btn" disabled>Voltar</button> <!-- Botão desabilitado -->
+    <button class="btn" disabled>Salvar</button> <!-- Botão desabilitado -->
+    <button class="btn btn-danger">Calcular</button> <!-- Botão vermelho (só este fica vermelho) -->
+
+    <!-- Interruptor de tema -->
+<label class="theme-toggle">
+  <input id="themeSwitch" type="checkbox" aria-label="Alternar tema">
+  <span class="slider"></span>
+  <span class="label">Dark mode</span>
+</label>
+
+  </div>
+  <!-- ===== FIM FORMULÁRIO ===== -->
+
+  <script> // ----- JAVASCRIPT DA CALCULADORA (AJUSTADO E COMENTADO) -----
+  (() => {
+    const elCalc    = document.getElementById('calc');        // Wrapper da calculadora
+    const displayEl = document.getElementById('calcDisplay');  // Visor
+
+    let prev = null;          // Número anterior
+    let curr = '0';           // Número atual (string)
+    let op   = null;          // Operador atual: + - * /
+    let justEvaluated = false;// Se verdadeiro, próxima digitação substitui o display
+
+    const toNum = v => parseFloat(v);                     // Converte string -> número
+    const show  = () => displayEl.textContent = curr;     // Atualiza visor
+
+    // Executa a operação entre dois números
+    const compute = (a, b, operator) => {
+      if (operator === '+') return a + b;
+      if (operator === '-') return a - b;
+      if (operator === '*') return a * b;
+      if (operator === '/') return b === 0 ? 'Erro' : a / b;
+      return b; // fallback
+    };
+
+    // Delegação de eventos: um único listener para todos os botões
+    elCalc.addEventListener('click', (ev) => {  // 'click' em minúsculas
+      const btn = ev.target.closest('button');  // botão clicado
+      if (!btn) return;
+
+      const action = btn.dataset.action;        // ação do botão
+
+      if (action === 'digit') {                 // dígitos e ponto
+        let d = btn.dataset.digit;
+        if (d === ',') d = '.';                 // aceita vírgula como ponto
+
+        if (justEvaluated) { curr = '0'; justEvaluated = false; } // limpa após '='
+        if (d === '.' && curr.includes('.')) { /* ignora segundo ponto */ }
+        else if (curr === '0' && d !== '.')   curr = d;           // substitui 0
+        else                                   curr += d;          // concatena
+      }
+
+      if (action === 'op') {                    // operador (+ - * /)
+        const nextOp = btn.dataset.op;
+        if (op !== null && prev !== null) {     // se já existe operação pendente
+          const res = compute(prev, toNum(curr), op);
+          curr = String(res);
+          prev = (res === 'Erro') ? null : toNum(curr);
+        } else {
+          prev = toNum(curr);
+        }
+        op = nextOp;                            // guarda novo operador
+        curr = '0';                             // zera display para digitar próximo número
+      }
+
+      if (action === 'equal') {                 // botão '='
+        if (op !== null) {
+          const res = compute(prev, toNum(curr), op);
+          curr = String(res);
+          prev = (res === 'Erro') ? null : toNum(curr);
+          op = null;
+          justEvaluated = true;                 // próxima digitação substitui
+        }
+      }
+
+      if (action === 'clear') {                 // limpar tudo
+        prev = null; op = null; curr = '0';
+      }
+
+      if (action === 'back') {                  // apagar último dígito
+        if (!justEvaluated) curr = (curr.length > 1 ? curr.slice(0, -1) : '0');
+      }
+
+      if (action === 'percent') {               // porcentagem
+        curr = String(toNum(curr) / 100);
+      }
+
+      show();                                   // atualiza o visor
+    });
+
+    // Suporte ao teclado (opcional)
+    window.addEventListener('keydown', (e) => {   // 'window' correto
+      const k = e.key;
+      if (/\d/.test(k)) document.querySelector('.calc [data-action="digit"][data-digit="'+k+'"]')?.click();
+      if (k === '.' || k === ',') document.querySelector('.calc [data-action="digit"][data-digit="."]')?.click();
+      if (['+','-','*','/'].includes(k)) document.querySelector('.calc [data-action="op"][data-op="'+k+'"]')?.click();
+      if (k === 'Enter' || k === '=') { e.preventDefault(); document.querySelector('.calc [data-action="equal"]')?.click(); }
+      if (k === 'Backspace') document.querySelector('.calc [data-action="back"]')?.click();
+      if (k === 'Escape')    document.querySelector('.calc [data-action="clear"]')?.click();
+    });
+
+    show(); // inicializa o visor com '0'
+  })();
+
+  // ===== Tema com persistência =====
+(() => {
+  const sw = document.getElementById('themeSwitch');
+  const key = 'theme-pref'; // chave de storage
+
+  // Carrega preferência
+  const saved = localStorage.getItem(key);
+  if (saved === 'dark') {
+    document.body.setAttribute('data-theme', 'dark');
+    if (sw) sw.checked = true;
+  }
+
+  // Alterna e salva
+  sw?.addEventListener('change', () => {
+    const dark = sw.checked;
+    document.body.setAttribute('data-theme', dark ? 'dark' : 'light');
+    localStorage.setItem(key, dark ? 'dark' : 'light');
+  });
+})();
+
+  </script> <!-- FIM DO SCRIPT DO INTERRUPTOR -->
+  </script> <!-- FIM DO SCRIPT -->
+
+</body> <!-- FIM DO BODY -->
+</html> <!-- FIM DO DOCUMENTO -->
